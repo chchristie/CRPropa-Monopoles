@@ -27,6 +27,7 @@ private:
 	Vector3d direction; ///< unit vector of velocity or momentum
 	double pmass; ///< particle rest mass
 	double charge; ///< particle charge
+	double mcharge; ///<particle magnetic charge
 
 public:
 	/** Constructor for a particle state.
@@ -37,7 +38,8 @@ public:
 	 */
 	ParticleState(int id = 0, double energy = 0,
 			Vector3d position = Vector3d(0, 0, 0),
-			Vector3d direction = Vector3d(-1, 0, 0));
+			Vector3d direction = Vector3d(-1, 0, 0),
+			double pmass = 0, double mcharge = 0);
 
 	/** Set particle position.
 	 In simulations including cosmological effects, the position is given in comoving coordinates.
@@ -75,8 +77,10 @@ public:
 	 This follows the PDG numbering scheme:
 	  https://pdg.lbl.gov/2019/reviews/rpp2019-rev-monte-carlo-numbering.pdf
 	 @param newId		id to be assigned to the particle 
+	 @param pmass		mass to be assigned to the particle if it is a dyon [in kilograms]
+	 @param mcharge		magnetic charge to be assigned to the particle if it is a dyon [in A*m]
 	 */
-	void setId(int newId);
+	void setId(int newId, double new_pmass = 100, double new_mcharge = 1);
 	/** Get particle ID
 	 @returns Particle ID (in PDG format).
 	 */
@@ -90,6 +94,18 @@ public:
 	 @returns Charge of the particle [in Coulombs]
 	 */
 	double getCharge() const;
+	/** Get magnetic charge of the particle.
+	 @returns Magnetic charge of the particle [in A*m]
+	 */
+	double getMcharge() const;
+	/** Set magnetic charge of the particle.
+	 @param new_mcharge		new magnetic charge to be assigned to the particle [in A*m]
+	 */
+	void setMcharge(double new_mcharge); 
+	/** Set mass of the particle.
+	 @param new_pmass		new mass to be assigned to the particle [in kilograms]
+	 */
+	void setMass(double new_pmass);
 	/** Get mass of the particle.
 	 @returns Mass of the particle [kg]
 	 */

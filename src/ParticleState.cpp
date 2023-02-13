@@ -11,9 +11,9 @@
 
 namespace crpropa {
 
-ParticleState::ParticleState(int id, double E, Vector3d pos, Vector3d dir): id(0), energy(0.), position(0.), direction(0.), pmass(0.), charge(0.)
+ParticleState::ParticleState(int id, double E, Vector3d pos, Vector3d dir, double pmass, double mcharge): id(0), energy(0.), position(0.), direction(0.), pmass(0.), charge(0.), mcharge(0.)
 {
-	setId(id);
+	setId(id, pmass, mcharge);
 	setEnergy(E);
 	setPosition(pos);
 	setDirection(dir);
@@ -47,14 +47,20 @@ double ParticleState::getRigidity() const {
 	return fabs(energy / charge);
 }
 
-void ParticleState::setId(int newId) {
+void ParticleState::setId(int newId, double new_pmass, double new_mcharge) {
 	id = newId;
 	if (isNucleus(id)) {
 		pmass = nuclearMass(id);
 		charge = chargeNumber(id) * eplus;
 		if (id < 0)
 			charge *= -1; // anti-nucleus
-	} else {
+	} 
+	else if (HepPID::isDyon(id)) {
+		setMass(new_pmass);
+		setMcharge(new_mcharge);
+		charge = HepPID::charge(id) * eplus;
+	}
+	else {
 		if (abs(id) == 11)
 			pmass = mass_electron;
 		charge = HepPID::charge(id) * eplus;
@@ -65,12 +71,26 @@ int ParticleState::getId() const {
 	return id;
 }
 
+void ParticleState::setMass(double new_pmass) {
+	pmass = new_pmass * kilogram;
+}
+
 double ParticleState::getMass() const {
 	return pmass;
 }
 
 double ParticleState::getCharge() const {
 	return charge;
+}
+
+double ParticleState::getMcharge() const {
+	return mcharge;
+}
+
+void ParticleState::setMcharge(double new_mcharge) {
+	mcharge = new_mcharge * ampere * meter;
+	if (id < 0)
+		mcharge *= -1; //anti-monopole
 }
 
 double ParticleState::getLorentzFactor() const {

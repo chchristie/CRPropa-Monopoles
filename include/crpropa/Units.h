@@ -72,6 +72,7 @@ static const double h_planck = 6.62606957e-34 * joule * second;
 static const double k_boltzmann = 1.3806488e-23 * joule / kelvin;
 static const double mu0 = 4 * M_PI * 1e-7 * newton / ampere / ampere;
 static const double epsilon0 = 1.0 / mu0 / c_squared * ampere * second / volt / meter;
+static const double gD =  h_planck / mu0 / eplus * ampere * meter;
 
 // gauss
 static const double gauss = 1e-4 * tesla;

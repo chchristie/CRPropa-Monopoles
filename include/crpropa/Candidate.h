@@ -52,11 +52,14 @@ private:
 	uint64_t serialNumber;
 
 public:
+	
 	Candidate(
 		int id = 0,
 		double energy = 0,
 		Vector3d position = Vector3d(0, 0, 0),
 		Vector3d direction = Vector3d(-1, 0, 0),
+		double pmass = 0,
+		double mcharge = 0,
 		double z = 0,
 		double weight = 1., 
 		std::string tagOrigin = "PRIM"
