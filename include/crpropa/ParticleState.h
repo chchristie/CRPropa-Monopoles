@@ -80,7 +80,7 @@ public:
 	 @param pmass		mass to be assigned to the particle if it is a dyon [in kilograms]
 	 @param mcharge		magnetic charge to be assigned to the particle if it is a dyon [in A*m]
 	 */
-	void setId(int newId, double new_pmass = 100, double new_mcharge = 1);
+	void setId(int newId, double new_pmass = 0, double new_mcharge = 0);
 	/** Get particle ID
 	 @returns Particle ID (in PDG format).
 	 */

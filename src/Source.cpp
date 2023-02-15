@@ -87,6 +87,32 @@ void SourceParticleType::setDescription() {
 }
 
 // ----------------------------------------------------------------------------
+SourceParticleMonopole::SourceParticleMonopole(int id, double pmass, double mcharge) :
+		id(id), pmass(pmass), mcharge(mcharge) {
+	setDescription();
+}
+
+void SourceParticleMonopole::prepareParticle(ParticleState& particle) const {
+	particle.setId(id);
+	particle.setMass(pmass);
+	particle.setMcharge(mcharge);
+}
+
+void SourceParticleMonopole::setDescription() {
+	std::stringstream ss;
+	ss << "SourceParticleMonopole: " << id << ", ";
+	ss << "Mass = " << pmass/(gigaelectronvolt/c_squared)<< " GeV/c^2, ";
+	if (id>0) {
+		ss << "Magnetic Charge = " << mcharge*ampere*meter/gD << " gD\n";
+	}
+	else {
+		ss << "Magnetic Charge = -" << mcharge*ampere*meter/gD << " gD\n";
+	}
+	description = ss.str();
+}
+
+
+// ----------------------------------------------------------------------------
 SourceMultipleParticleTypes::SourceMultipleParticleTypes() {
 	setDescription();
 }

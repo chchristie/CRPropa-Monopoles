@@ -58,7 +58,9 @@ void ParticleState::setId(int newId, double new_pmass, double new_mcharge) {
 	else if (HepPID::isDyon(id)) {
 		setMass(new_pmass);
 		setMcharge(new_mcharge);
-		charge = HepPID::charge(id) * eplus;
+		charge = HepPID::charge(id) * eplus; //returns positive for 411xyz0, negative for 412xyz0. Need to flip sign if id is negative
+		if (id < 0)
+			charge *= -1;
 	}
 	else {
 		if (abs(id) == 11)
@@ -88,7 +90,7 @@ double ParticleState::getMcharge() const {
 }
 
 void ParticleState::setMcharge(double new_mcharge) {
-	mcharge = new_mcharge * ampere * meter;
+	mcharge = fabs(new_mcharge * ampere * meter);
 	if (id < 0)
 		mcharge *= -1; //anti-monopole
 }
@@ -115,7 +117,10 @@ std::string ParticleState::getDescription() const {
 	ss << "Particle " << id << ", ";
 	ss << "E = " << energy / EeV << " EeV, ";
 	ss << "x = " << position / Mpc << " Mpc, ";
-	ss << "p = " << direction;
+	ss << "p = " << direction << " (direction), ";
+	ss << "q = " << charge << " C, ";
+	ss << "m = " << pmass / (gigaelectronvolt / c_squared) << " GeV/c^2, ";
+	ss << "gD = " << mcharge / gD << " gD";
 	return ss.str();
 }
 

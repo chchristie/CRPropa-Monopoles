@@ -100,6 +100,30 @@ public:
 
 
 /**
+ @class SourceParticleMonopole
+ @brief Magnetic Monopole at the source
+
+ This feature assigns a monopole to the source.
+ For multiple types, use e.g. SourceMultipleParticleTypes.
+ Monopoles are identified following the PDG numbering scheme:
+   https://pdg.lbl.gov/2019/reviews/rpp2019-rev-monte-carlo-numbering.pdf
+ Monopoles also need their mass and magnetic charge defined
+ */
+class SourceParticleMonopole: public SourceFeature {
+	int id;
+	double pmass;
+	double mcharge;
+public:
+	/** Constructor for a source with a sign
+	 @param id		id of the particle following the PDG numbering scheme
+	*/
+	SourceParticleMonopole(int id, double pmass = 100*gigaelectronvolt/c_squared, double mcharge = 1*gD);
+	void prepareParticle(ParticleState &particle) const;
+	void setDescription();
+};
+
+
+/**
  @class SourceMultipleParticleTypes
  @brief Multiple particle types with individual relative abundances
 
