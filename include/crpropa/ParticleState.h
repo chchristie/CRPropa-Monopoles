@@ -22,7 +22,7 @@ namespace crpropa {
 class ParticleState {
 private:
 	int id; ///< particle ID (Particle Data Group numbering scheme)
-	double energy; ///< total energy
+	double energy; ///< kinetic energy
 	Vector3d position; ///< position vector in comoving coordinates
 	Vector3d direction; ///< unit vector of velocity or momentum
 	double pmass; ///< particle rest mass
@@ -32,7 +32,7 @@ private:
 public:
 	/** Constructor for a particle state.
 	 @param id			id of the particle following the PDG numbering scheme
-	 @param energy		energy of the particle [in Joules]
+	 @param energy		kinetic energy of the particle [in Joules]
 	 @param position	vector containing the coordinates of the particle [in meters]
 	 @param direction	vector containing the direction of motion of the particle
 	 */
@@ -60,11 +60,11 @@ public:
 	 */
 	const Vector3d &getDirection() const;
 
-	/** Set energy of particle.
+	/** Set kinetic energy of particle.
 	 @param newEnergy	energy to be assigned to particle [in Joules]
 	 */
 	void setEnergy(double newEnergy);
-	/** Get energy of particle.
+	/** Get kinetic energy of particle.
 	 @returns Energy of particle [in Joules]
 	 */
 	double getEnergy() const;

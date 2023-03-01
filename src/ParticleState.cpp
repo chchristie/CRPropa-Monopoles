@@ -96,20 +96,20 @@ void ParticleState::setMcharge(double new_mcharge) {
 }
 
 double ParticleState::getLorentzFactor() const {
-	return energy / (pmass * c_squared);
+	return 1 + energy / (pmass * c_squared);
 }
 
 void ParticleState::setLorentzFactor(double lf) {
 	lf = std::max(0., lf); // prevent negative Lorentz factors
-	energy = lf * pmass * c_squared;
+	energy = (lf - 1) * pmass * c_squared;
 }
 
 Vector3d ParticleState::getVelocity() const {
-	return direction * c_light;
+	return direction * c_light * sqrt(1 - 1 / (1 + energy / pmass / c_squared) / (1 + energy / pmass / c_squared));
 }
 
 Vector3d ParticleState::getMomentum() const {
-	return direction * (energy / c_light);
+	return direction * sqrt( (energy + pmass * c_squared) * (energy + pmass * c_squared) - (pmass * c_squared) * (pmass * c_squared) ) / c_light;
 }
 
 std::string ParticleState::getDescription() const {
