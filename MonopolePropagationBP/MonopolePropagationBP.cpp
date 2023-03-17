@@ -6,28 +6,48 @@
 
 namespace crpropa {
 	void MonopolePropagationBP::tryStep(const Y &y, Y &out, Y &error, double h,
-			ParticleState &particle, double z, double m, double g) const {
-		out = dY(y.x, y.u, h, z, g, m);  // 1 step with h
-
-		Y outHelp = dY(y.x, y.u, h/2, z, g, m);  // 2 steps with h/2
-		Y outCompare = dY(outHelp.x, outHelp.u, h/2, z, g, m);
+			ParticleState &p, double z) const {
+		out = dY(y.x, y.u, h, p, z);  // 1 step with h
+		
+		// 2 steps with h/2
+		Y outHelp = dY(y.x, y.u, h/2, p, z);
+		Y outCompare = dY(outHelp.x, outHelp.u, h/2, p, z);
 
 		error = errorEstimation(out.x , outCompare.x , h);
 	}
 
 
 	MonopolePropagationBP::Y MonopolePropagationBP::dY(Vector3d pos, Vector3d dir, double step,
-			double z, double g, double m) const {
+			ParticleState &p, double z) const {
 		// half leap frog step in the position
 		pos += dir * step / 2.;
 
 		// get B field at particle position
 		Vector3d B = getFieldAtPosition(pos, z);
+		
+		// define useful particle quantities
+		double g = p.getMcharge();
+		double q = p.getCharge();
+		double m = p.getMass();
+		Vector3d vi = p.getVelocity();
+		double lf = p.getLorentzFactor();
 
+		// first half magnetic field acceleration
+		Vector3d u_minus = vi * lf + g * step * B / 2. / m / c_light;
+		
+		// help vectors
+		double gamma_half = sqrt(1. + u_minus.dot(u_minus) / c_squared);
+		Vector3d t = q * step * B / 2. / m / c_light / gamma_half;
+		Vector3d s = 2. * t / (1. + t.dot(t));
+		
+		// second half magnetic field acceleration
+		Vector3d u_plus = u_minus + (u_minus + u_minus.cross(t)).cross(s);
+		
 		// Boris push
-		dir = dir + g*B*step/m/c_squared;
+		Vector3d ui_1 = u_plus + g * step * B / 2. / m / c_light;
 
 		// the other half leap frog step in the position
+		dir = ui_1.getUnitVector(); 
 		pos += dir * step / 2.;
 		return Y(pos, dir);
 	}
@@ -76,12 +96,11 @@ namespace crpropa {
 		Y yOut, yErr;
 		double newStep = step;
 		double z = candidate->getRedshift();
-		double m = current.getEnergy()/(c_light * c_light);
 
 		// if minStep is the same as maxStep the adaptive algorithm with its error
 		// estimation is not needed and the computation time can be saved:
 		if (minStep == maxStep){
-			tryStep(yIn, yOut, yErr, step, current, z, m, g);
+			tryStep(yIn, yOut, yErr, step, current, z);
 		} else {
 			step = clip(candidate->getNextStep(), minStep, maxStep);
 			newStep = step;
@@ -89,7 +108,7 @@ namespace crpropa {
 
 			// try performing step until the target error (tolerance) or the minimum/maximum step size has been reached
 			while (true) {
-				tryStep(yIn, yOut, yErr, step, current, z, m, g);
+				tryStep(yIn, yOut, yErr, step, current, z);
 				r = yErr.u.getR() / tolerance;  // ratio of absolute direction error and tolerance
 				if (r > 1) {  // large direction error relative to tolerance, try to decrease step size
 					if (step == minStep)  // already minimum step size

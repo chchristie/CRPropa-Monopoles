@@ -246,4 +246,12 @@ void Candidate::restart() {
 	current = source;
 }
 
+void Candidate::setStepRadiation(double radiation)  {
+	stepRadiation = radiation;
+}
+
+double Candidate::getStepRadiation() const {
+	return stepRadiation;
+}
+
 } // namespace crpropa

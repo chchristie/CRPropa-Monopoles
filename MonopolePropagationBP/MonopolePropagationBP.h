@@ -79,12 +79,11 @@ public:
 	 * @param pos	current position of the candidate
 	 * @param dir	current direction of the candidate
 	 * @param step	current step size of the candidate
-	 * @param z		current redshift is needed to calculate the magnetic field
-	 * @param g		current magnetic charge of the candidate
-	 * @param m		current mass of the candidate
+	 * @param p	current particle state
+	 * @param z
 	 * @return	  return the new calculated position and direction of the candidate 
 	 */
-	Y dY(Vector3d  pos, Vector3d  dir, double step, double z, double g, double m) const;
+	Y dY(Vector3d  pos, Vector3d  dir, double step, ParticleState &p, double z) const;
 
 	/** comparison of the position after one step with the position after two steps with step/2.
 	 * @param x1	position after one step of size step
@@ -107,11 +106,9 @@ public:
 	 * @param error	 error for the current step
 	 * @param h		 current step size
 	 * @param p		 current particle state
-	 * @param z		 current red shift
-	 * @param m		 current mass of the candidate
-	 * @param g		 current magnetic charge of the candidate 
+	 * @param z	current redshift
 	 */
-	void tryStep(const Y &y, Y &out, Y &error, double h, ParticleState &p, double z, double m, double g) const;
+	void tryStep(const Y &y, Y &out, Y &error, double h, ParticleState &p, double z) const;
 
 	/** Set functions for the parameters of the class PropagationBP */
 

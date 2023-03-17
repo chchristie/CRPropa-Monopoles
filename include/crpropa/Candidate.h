@@ -46,6 +46,7 @@ private:
 	double trajectoryLength; /**< Comoving distance [m] the candidate has traveled so far */
 	double currentStep; /**< Size of the currently performed step in [m] comoving units */
 	double nextStep; /**< Proposed size of the next propagation step in [m] comoving units */
+	double stepRadiation; /**<Electromagnetic radiation lost at current step */
 	std::string tagOrigin; /**< Name of interaction/source process which created this candidate*/
 
 	static uint64_t nextSerialNumber;
@@ -163,6 +164,14 @@ public:
 	 and activate it if inactive, e.g. restart it
 	*/
 	void restart();
+	
+	/**
+	 Sets the electromagnetic radiation loss variable at current step.
+	 Only the radiation module should use this.
+	 This is only for debugging, does not impact the code
+	 */
+	void setStepRadiation(double radiation);
+	double getStepRadiation() const;
 };
 
 /** @}*/
