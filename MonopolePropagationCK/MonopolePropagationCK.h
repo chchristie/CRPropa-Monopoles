@@ -24,7 +24,7 @@ class MonopolePropagationCK: public Module {
 public:
 	class Y {
 	public:
-		Vector3d x, u; /*< phase-point: position and direction */
+		Vector3d x, u; /*< phase-point: position and momentum */
 
 		Y() {
 		}
@@ -68,7 +68,7 @@ public:
 	void process(Candidate *candidate) const;
 
 	// derivative of phase point, dY/dt = d/dt(x, u) = (v, du/dt)
-	// du/dt = q*c/E * (u x B)
+	// du/dt = dp/dt = F = g*B + q*vxB
 	Y dYdt(const Y &y, ParticleState &p, double z) const;
 
 	void tryStep(const Y &y, Y &out, Y &error, double t,

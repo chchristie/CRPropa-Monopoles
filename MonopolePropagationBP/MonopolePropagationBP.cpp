@@ -34,14 +34,18 @@ namespace crpropa {
 
 		// first half magnetic field acceleration
 		Vector3d u_minus = vi * lf + g * step * B / 2. / m / c_light;
+		Vector3d u_plus;
 		
-		// help vectors
-		double gamma_half = sqrt(1. + u_minus.dot(u_minus) / c_squared);
-		Vector3d t = q * step * B / 2. / m / c_light / gamma_half;
-		Vector3d s = 2. * t / (1. + t.dot(t));
-		
-		// second half magnetic field acceleration
-		Vector3d u_plus = u_minus + (u_minus + u_minus.cross(t)).cross(s);
+		if (abs(q) < 1.602e-19) u_plus = u_minus;
+		else {
+			// help vectors
+			double gamma_half = sqrt(1. + u_minus.dot(u_minus) / c_squared);
+			Vector3d t = q * step * B / 2. / m / c_light / gamma_half;
+			Vector3d s = 2. * t / (1. + t.dot(t));
+			
+			// second half magnetic field acceleration
+			u_plus = u_minus + (u_minus + u_minus.cross(t)).cross(s);
+		}
 		
 		// Boris push
 		Vector3d ui_1 = u_plus + g * step * B / 2. / m / c_light;
@@ -49,7 +53,8 @@ namespace crpropa {
 		// the other half leap frog step in the position
 		dir = ui_1.getUnitVector(); 
 		pos += dir * step / 2.;
-		return Y(pos, dir);
+		double E = sqrt(pow(m*c_squared, 2) + pow(ui_1.getR()*m*c_light, 2)) - m*c_squared; 
+		return Y(pos, dir, E);
 	}
 
 
@@ -132,11 +137,7 @@ namespace crpropa {
 
 		current.setPosition(yOut.x);
 		current.setDirection(yOut.u.getUnitVector());
-		
-		Vector3d B = getFieldAtPosition(current.getPosition(), z);
-		double E = current.getEnergy();
-		double dE = g*B.dot(current.getDirection() * step);
-		current.setEnergy(E+dE);
+		current.setEnergy(yOut.E);
 		
 		candidate->setCurrentStep(step);
 		candidate->setNextStep(newStep);

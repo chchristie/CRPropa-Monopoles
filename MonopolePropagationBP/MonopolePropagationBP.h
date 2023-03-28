@@ -27,12 +27,17 @@ public:
 	class Y {
 	public:
 		Vector3d x, u; /*< phase-point: position and direction */
+		double E; /*< energy*/
 
 		Y() {
 		}
-
+		
 		Y(const Vector3d &x, const Vector3d &u) :
 				x(x), u(u) {
+		}
+
+		Y(const Vector3d &x, const Vector3d &u, double E) :
+				x(x), u(u), E(E) {
 		}
 
 		Y(double f) :
@@ -102,7 +107,7 @@ public:
 
 	/** Adapt step size if required and calculates the new position and direction of the particle with the usage of the function dY
 	 * @param y		 current position and direction of candidate
-	 * @param out	   position and direction of candidate after the step
+	 * @param out	   position, direction, and energy of candidate after the step
 	 * @param error	 error for the current step
 	 * @param h		 current step size
 	 * @param p		 current particle state

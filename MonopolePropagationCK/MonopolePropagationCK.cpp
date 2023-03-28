@@ -49,14 +49,14 @@ void MonopolePropagationCK::tryStep(const Y &y, Y &out, Y &error, double h,
 }
 
 MonopolePropagationCK::Y MonopolePropagationCK::dYdt(const Y &y, ParticleState &p, double z) const {
-	// normalize direction vector to prevent numerical losses
+	// Derivative of position is velocity
 	Vector3d velocity = p.getVelocity();
 	
 	// get B field at particle position
 	Vector3d B = getFieldAtPosition(y.x, z);
 
-	// Lorentz force: du/dt = q*c/E * (v x B)
-	Vector3d dudt = (p.getMcharge() * B + p.getCharge() * velocity.cross(B)) / p.getLorentzFactor() / p.getMass() / sqrt(velocity.dot(velocity));
+	// Lorentz force: du/dt = dp/dt = F = g*B + q*vxB
+	Vector3d dudt = p.getMcharge() * B + p.getCharge() * velocity.cross(B);
 	return Y(velocity, dudt);
 }
 
@@ -79,7 +79,7 @@ void MonopolePropagationCK::process(Candidate *candidate) const {
 	ParticleState &current = candidate->current;
 	candidate->previous = current;
 
-	Y yIn(current.getPosition(), current.getDirection());
+	Y yIn(current.getPosition(), current.getMomentum());
 	double step = maxStep;
 
 	// rectilinear propagation for neutral particles
@@ -130,12 +130,10 @@ void MonopolePropagationCK::process(Candidate *candidate) const {
 	}
 
 	current.setPosition(yOut.x);
+	double m = current.getMass();
+	double E = sqrt(pow(m*c_squared, 2) + pow(yOut.u.getR()*c_light, 2)) - m*c_squared; 
+	current.setEnergy(E);
 	current.setDirection(yOut.u.getUnitVector());
-	
-	Vector3d B = getFieldAtPosition(current.getPosition(), z);
-	double E = current.getEnergy();
-	double dE = current.getMcharge()*B.dot(yOut.x-yIn.x);
-	current.setEnergy(E+dE);
 	
 	candidate->setCurrentStep(step);
 	candidate->setNextStep(newStep);
