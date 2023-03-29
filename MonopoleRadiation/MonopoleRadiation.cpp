@@ -113,32 +113,27 @@ void MonopoleRadiation::process(Candidate *candidate) const{
 	if (mcharge == 0)
 		return; // only charged particles
 
-	// calculate gyroradius, evaluated at the current position
+	// get magnetic field
+	Vector3d pos = candidate->current.getPosition();
 	double z = candidate->getRedshift();
-	double B;
-	if (field.valid()) {
-		Vector3d Bvec = field->getField(candidate->current.getPosition(), z);
-		B = Bvec.cross(candidate->current.getDirection()).getR();
-	} else {
-		B = sqrt(2. / 3) * Brms; // average perpendicular field component
-	}
-	B *= pow(1 + z, 2); // cosmological scaling
+	Vector3d B = getFieldAtPosition(pos, z);
 
 	//Get helper values
 	double lf = candidate->current.getLorentzFactor();
 	double step = candidate->getCurrentStep() / (1 + z); // step size in local frame
-	Vector3d beta = candidate->current.getVelocity() / c_light;
-	Vector3d dbeta = (candidate->current.getVelocity() - candidate->previous.getVelocity()) / step;	//d(beta)/dt = vf-vi/c*t = vf-vi/step
+	Vector3d v = candidate->current.getVelocity();
+	Vector3d F = mcharge*B + candidate->current.getCharge()*v.cross(B);
+	double m = candidate->current.getMass();
 	
 	// calculate energy loss
-	double dEdx = mu0 / 6 / M_PI * pow(lf, 6) * pow(mcharge / c_light, 2) * (dbeta.dot(dbeta) - beta.cross(dbeta).dot(beta.cross(dbeta))); // Jackson p. 666 (14.26)
-	double dE = step * dEdx;
+	double P = mu0 / 6 / M_PI * pow(mcharge * lf / m, 2) * pow(1/c_light, 3) * (F.dot(F) - pow(v.dot(F), 2)/c_squared); // Jackson p. 666 (14.26)
+	double dE = P * step / c_light;
 	candidate->setStepRadiation(dE);
 
 	// apply energy loss and limit next step
 	double E = candidate->current.getEnergy();
 	candidate->current.setEnergy(E - dE);
-	candidate->limitNextStep(limit * E / dEdx);
+	candidate->limitNextStep(limit * E * c_light / P);
 
 	// optionally add secondary photons
 	if (not(havePhotons))
@@ -204,6 +199,20 @@ void MonopoleRadiation::process(Candidate *candidate) const{
 				candidate->addSecondary(22, Ephoton, pos, w, interactionTag);
 		}
 	} */
+}
+
+Vector3d MonopoleRadiation::getFieldAtPosition(Vector3d pos, double z) const {
+	Vector3d B(0, 0, 0);
+	try {
+		// check if field is valid and use the field vector at the
+		// position pos with the redshift z
+		if (field.valid())
+			B = field->getField(pos, z);
+	} catch (std::exception &e) {
+		KISS_LOG_ERROR 	<< "MonopoleRadiation: Exception in MonopoleRadiation::getFieldAtPosition.\n"
+				<< e.what();
+	}	
+	return B;
 }
 
 std::string MonopoleRadiation::getDescription() const {

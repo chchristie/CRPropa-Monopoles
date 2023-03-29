@@ -1,5 +1,6 @@
 #include "crpropa/Module.h"
 #include "crpropa/magneticField/MagneticField.h"
+#include "kiss/logger.h"
 
 namespace crpropa {
 /**
@@ -79,6 +80,13 @@ public:
 	void initSpectrum();
 	void process(Candidate *candidate) const;
 	std::string getDescription() const;
+	
+	/** Get magnetic field vector at current candidate position
+	 * @param pos   current position of the candidate
+	 * @param z	 current redshift is needed to calculate the magnetic field
+	 * @return	  magnetic field vector at the position pos 
+	 */
+	Vector3d getFieldAtPosition(Vector3d pos, double z) const;
 };
 /** @}*/
 
