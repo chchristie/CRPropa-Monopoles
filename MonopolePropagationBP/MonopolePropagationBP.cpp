@@ -7,20 +7,21 @@
 namespace crpropa {
 	void MonopolePropagationBP::tryStep(const Y &y, Y &out, Y &error, double h,
 			ParticleState &p, double z) const {
-		out = dY(y.x, y.u, h, p, z);  // 1 step with h
+		out = dY(y.x, h, p, z);  // 1 step with h
 		
 		// 2 steps with h/2
-		Y outHelp = dY(y.x, y.u, h/2, p, z);
-		Y outCompare = dY(outHelp.x, outHelp.u, h/2, p, z);
+		Y outHelp = dY(y.x, h/2, p, z);
+		Y outCompare = dY(outHelp.x, h/2, p, z);
 
 		error = errorEstimation(out.x , outCompare.x , h);
 	}
 
 
-	MonopolePropagationBP::Y MonopolePropagationBP::dY(Vector3d pos, Vector3d dir, double step,
+	MonopolePropagationBP::Y MonopolePropagationBP::dY(Vector3d pos, double step,
 			ParticleState &p, double z) const {
 		// half leap frog step in the position
-		pos += dir * step / 2.;
+		Vector3d vi = p.getVelocity();
+		pos += vi * step / 2. / c_light;
 
 		// get B field at particle position
 		Vector3d B = getFieldAtPosition(pos, z);
@@ -29,14 +30,13 @@ namespace crpropa {
 		double g = p.getMcharge();
 		double q = p.getCharge();
 		double m = p.getMass();
-		Vector3d vi = p.getVelocity();
 		double lf = p.getLorentzFactor();
 
 		// first half magnetic field acceleration
 		Vector3d u_minus = vi * lf + g * step * B / 2. / m / c_light;
 		Vector3d u_plus;
 		
-		if (abs(q) < 1.602e-19) u_plus = u_minus;
+		if (q == 0.0) u_plus = u_minus;
 		else {
 			// help vectors
 			double gamma_half = sqrt(1. + u_minus.dot(u_minus) / c_squared);
@@ -51,8 +51,9 @@ namespace crpropa {
 		Vector3d ui_1 = u_plus + g * step * B / 2. / m / c_light;
 
 		// the other half leap frog step in the position
-		dir = ui_1.getUnitVector(); 
-		pos += dir * step / 2.;
+		Vector3d dir = ui_1.getUnitVector(); 
+		Vector3d vi_1 = c_light / pow(1 + c_squared / ui_1.dot(ui_1), 0.5) * dir;
+		pos += vi * step / 2. / c_light;
 		double E = sqrt(pow(m*c_squared, 2) + pow(ui_1.getR()*m*c_light, 2)) - m*c_squared; 
 		return Y(pos, dir, E);
 	}
@@ -92,7 +93,7 @@ namespace crpropa {
 		// rectilinear propagation for neutral particles
 		if (g == 0) {
 			step = clip(candidate->getNextStep(), minStep, maxStep);
-			current.setPosition(yIn.x + yIn.u * step);
+			current.setPosition(yIn.x + current.getVelocity() * step / c_light);
 			candidate->setCurrentStep(step);
 			candidate->setNextStep(maxStep);
 			return;

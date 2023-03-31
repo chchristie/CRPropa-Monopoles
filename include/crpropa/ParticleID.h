@@ -29,6 +29,8 @@ int massNumber(int id);
 
 bool isNucleus(int id);
 
+bool isDyon(int id);
+
 /* Additional modules */
 std::string convertIdToName(int id); 
 

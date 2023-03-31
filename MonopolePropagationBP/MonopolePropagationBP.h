@@ -82,13 +82,12 @@ public:
 
 	/** Calculates the new position and direction of the particle based on the solution of the Lorentz force
 	 * @param pos	current position of the candidate
-	 * @param dir	current direction of the candidate
 	 * @param step	current step size of the candidate
 	 * @param p	current particle state
-	 * @param z
-	 * @return	  return the new calculated position and direction of the candidate 
+	 * @param z	current redshift
+	 * @return	  return the new calculated position, direction, and energy of the candidate 
 	 */
-	Y dY(Vector3d  pos, Vector3d  dir, double step, ParticleState &p, double z) const;
+	Y dY(Vector3d  pos, double step, ParticleState &p, double z) const;
 
 	/** comparison of the position after one step with the position after two steps with step/2.
 	 * @param x1	position after one step of size step

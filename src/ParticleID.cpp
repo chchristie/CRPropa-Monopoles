@@ -40,6 +40,12 @@ bool isNucleus(int id) {
 	return HepPID::isNucleus(id);
 }
 
+bool isDyon(int id) {
+	if (id == 4110000 || id == 4120000 || id == -4110000 || id == -4120000)
+		return true; // consider monopoles as dyons
+	return HepPID::isDyon(id);
+}
+
 std::string convertIdToName(int id) {
 	// handle a few extra cases that HepPID doesn't like
 	if (id == 1000000010) // neutron

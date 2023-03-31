@@ -55,7 +55,7 @@ void ParticleState::setId(int newId, double new_pmass, double new_mcharge) {
 		if (id < 0)
 			charge *= -1; // anti-nucleus
 	} 
-	else if (HepPID::isDyon(id)) {
+	else if (isDyon(id)) {
 		setMass(new_pmass);
 		setMcharge(new_mcharge);
 		charge = HepPID::charge(id) * eplus; //returns positive for 411xyz0, negative for 412xyz0. Need to flip sign if id is negative

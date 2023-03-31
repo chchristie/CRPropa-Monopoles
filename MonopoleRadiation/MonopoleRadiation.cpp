@@ -120,13 +120,19 @@ void MonopoleRadiation::process(Candidate *candidate) const{
 
 	//Get helper values
 	double lf = candidate->current.getLorentzFactor();
-	double step = candidate->getCurrentStep() / (1 + z); // step size in local frame
+	double step = candidate->getCurrentStep(); // step size in local frame
 	Vector3d v = candidate->current.getVelocity();
-	Vector3d F = mcharge*B + candidate->current.getCharge()*v.cross(B);
+	Vector3d F = mcharge*B + candidate->current.getCharge()*v.cross(B); //Force on particle
 	double m = candidate->current.getMass();
 	
+	//Vector3d a = F_mag / m * (dir / cos * (1/ pow(lf, 3)  -1 / lf) + Fdir / lf);
+	Vector3d a;	
+	if (F.isParallelTo(v, 0.0001)) a = F / m / pow(lf, 3); //Limit floating point errors in linear accelerator
+	else a = 1 / m / lf * (F - F.dot(v)*v / c_squared);
+	
 	// calculate energy loss
-	double P = mu0 / 6 / M_PI * pow(mcharge * lf / m, 2) * pow(1/c_light, 3) * (F.dot(F) - pow(v.dot(F), 2)/c_squared); // Jackson p. 666 (14.26)
+	//double P = mu0 / 6 / M_PI * pow(mcharge * lf / m, 2) * pow(1/c_light, 3) * (F.dot(F) - pow(lf, 6) * pow( m * v.dot(a), 2)/c_squared); // Jackson p. 666 (14.26)
+	double P = mu0 * pow(mcharge, 2) * pow (lf, 6) / 6 / M_PI / c_light * (a.dot(a) / c_squared- v.cross(a).dot(v.cross(a)) / c_squared / c_squared); 
 	double dE = P * step / c_light;
 	candidate->setStepRadiation(dE);
 
@@ -208,6 +214,7 @@ Vector3d MonopoleRadiation::getFieldAtPosition(Vector3d pos, double z) const {
 		// position pos with the redshift z
 		if (field.valid())
 			B = field->getField(pos, z);
+		else B = Brms;
 	} catch (std::exception &e) {
 		KISS_LOG_ERROR 	<< "MonopoleRadiation: Exception in MonopoleRadiation::getFieldAtPosition.\n"
 				<< e.what();

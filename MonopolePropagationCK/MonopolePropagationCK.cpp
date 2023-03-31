@@ -85,7 +85,7 @@ void MonopolePropagationCK::process(Candidate *candidate) const {
 	// rectilinear propagation for neutral particles
 	if (current.getCharge() == 0 && current.getMcharge() == 0) {
 		step = clip(candidate->getNextStep(), minStep, maxStep);
-		current.setPosition(yIn.x + yIn.u * step);
+		current.setPosition(yIn.x + current.getVelocity() * step / c_light);
 		candidate->setCurrentStep(step);
 		candidate->setNextStep(maxStep);
 		return;
