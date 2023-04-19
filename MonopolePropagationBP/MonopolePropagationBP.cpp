@@ -36,16 +36,14 @@ namespace crpropa {
 		Vector3d u_minus = vi * lf + g * step * B / 2. / m / c_light;
 		Vector3d u_plus;
 		
-		if (q == 0.0) u_plus = u_minus;
-		else {
-			// help vectors
-			double gamma_half = sqrt(1. + u_minus.dot(u_minus) / c_squared);
-			Vector3d t = q * step * B / 2. / m / c_light / gamma_half;
-			Vector3d s = 2. * t / (1. + t.dot(t));
-			
-			// second half magnetic field acceleration
-			u_plus = u_minus + (u_minus + u_minus.cross(t)).cross(s);
-		}
+		// help vectors
+		double gamma_half = sqrt(1. + u_minus.dot(u_minus) / c_squared);
+		Vector3d t = q * step * B / 2. / m / c_light / gamma_half;
+		Vector3d s = 2. * t / (1. + t.dot(t));
+		
+		// second half magnetic field acceleration
+		u_plus = u_minus + (u_minus + u_minus.cross(t)).cross(s);
+
 		
 		// Boris push
 		Vector3d ui_1 = u_plus + g * step * B / 2. / m / c_light;
