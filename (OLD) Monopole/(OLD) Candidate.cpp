@@ -6,9 +6,9 @@
 
 namespace crpropa {
 
-Candidate::Candidate(int id, double E, Vector3d pos, Vector3d dir, double z, double weight, std::string tagOrigin) :
+Candidate::Candidate(int id, double E, Vector3d pos, Vector3d dir, double pmass, double mcharge, double z, double weight, std::string tagOrigin) :
   redshift(z), trajectoryLength(0), weight(weight), currentStep(0), nextStep(0), active(true), parent(0), tagOrigin(tagOrigin) {
-	ParticleState state(id, E, pos, dir);
+	ParticleState state(id, E, pos, dir, pmass, mcharge);
 	source = state;
 	created = state;
 	previous = state;
@@ -244,6 +244,14 @@ void Candidate::restart() {
 	setTrajectoryLength(0);
 	previous = source;
 	current = source;
+}
+
+void Candidate::setStepRadiation(double radiation)  {
+	stepRadiation = radiation;
+}
+
+double Candidate::getStepRadiation() const {
+	return stepRadiation;
 }
 
 } // namespace crpropa

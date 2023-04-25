@@ -6,7 +6,7 @@
 
 namespace crpropa {
 	void MonopolePropagationBP::tryStep(const Y &y, Y &out, Y &error, double h,
-			ParticleState &p, double z) const {
+			MParticleState &p, double z) const {
 		out = dY(y.x, h, p, z);  // 1 step with h
 		
 		// 2 steps with h/2
@@ -18,7 +18,7 @@ namespace crpropa {
 
 
 	MonopolePropagationBP::Y MonopolePropagationBP::dY(Vector3d pos, double step,
-			ParticleState &p, double z) const {
+			MParticleState &p, double z) const {
 		// half leap frog step in the position
 		Vector3d vi = p.getVelocity();
 		pos += vi * step / 2. / c_light;
@@ -77,9 +77,13 @@ namespace crpropa {
 	}
 
 
-	void MonopolePropagationBP::process(Candidate *candidate) const {
+	void MonopolePropagationBP::process(Candidate *candidate_base) const {
 		// save the new previous particle state
-		ParticleState &current = candidate->current;
+		//if (!isDyon(candidate_base->current.getId())) {
+		//	return;
+		//}
+		MCandidate *candidate = static_cast<MCandidate*>(candidate_base);
+		MParticleState &current = candidate->current;
 		candidate->previous = current;
 
 		Y yIn(current.getPosition(), current.getDirection());

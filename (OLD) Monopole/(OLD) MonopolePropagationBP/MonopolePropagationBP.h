@@ -3,6 +3,7 @@
 #include "crpropa/Units.h"
 #include "crpropa/magneticField/MagneticField.h"
 #include "kiss/logger.h"
+#include "../Monopole.h"
 
 namespace crpropa {
 /**
@@ -78,7 +79,7 @@ public:
 
 	/** Propagates the particle. Is called once per iteration.
 	 * @param candidate	 The Candidate is a passive object, that holds the information about the state of the cosmic ray and the simulation itself. */
-	void process(Candidate *candidate) const;
+	void process(Candidate *candidate_base) const;
 
 	/** Calculates the new position and direction of the particle based on the solution of the Lorentz force
 	 * @param pos	current position of the candidate
@@ -87,7 +88,7 @@ public:
 	 * @param z	current redshift
 	 * @return	  return the new calculated position, direction, and energy of the candidate 
 	 */
-	Y dY(Vector3d  pos, double step, ParticleState &p, double z) const;
+	Y dY(Vector3d  pos, double step, crpropa::MParticleState &p, double z) const;
 
 	/** comparison of the position after one step with the position after two steps with step/2.
 	 * @param x1	position after one step of size step
@@ -112,7 +113,7 @@ public:
 	 * @param p		 current particle state
 	 * @param z	current redshift
 	 */
-	void tryStep(const Y &y, Y &out, Y &error, double h, ParticleState &p, double z) const;
+	void tryStep(const Y &y, Y &out, Y &error, double h, MParticleState &p, double z) const;
 
 	/** Set functions for the parameters of the class PropagationBP */
 

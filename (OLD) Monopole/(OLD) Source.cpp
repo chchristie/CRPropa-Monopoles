@@ -87,7 +87,6 @@ void SourceParticleType::setDescription() {
 }
 
 // ----------------------------------------------------------------------------
-/*
 SourceParticleMonopole::SourceParticleMonopole(int id, double pmass, double mcharge) :
 		id(id), pmass(pmass), mcharge(mcharge) {
 	setDescription();
@@ -112,7 +111,7 @@ void SourceParticleMonopole::setDescription() {
 	description = ss.str();
 }
 
-*/
+
 // ----------------------------------------------------------------------------
 SourceMultipleParticleTypes::SourceMultipleParticleTypes() {
 	setDescription();

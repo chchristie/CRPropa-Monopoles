@@ -1,0 +1,3 @@
+This directory contains the old implementatation of CRPropa3 with Monopoles. 
+In this implementation, the Candidate, ParticleState, Source, and Units .h and .cpp files in CRPropa3 were replaced with the ones in this directory.
+The old MonopolePropagationBP/CK and MonopoleRadiation modules only worked if the above CRPropa3 files were modified accordingly.

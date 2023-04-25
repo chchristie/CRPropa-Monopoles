@@ -20,6 +20,7 @@ namespace crpropa {
 /**
  @class Candidate Candidate.h include/crpropa/Candidate.h
  @brief All information about the cosmic ray.
+
  The Candidate is a passive object, that holds the information about the state
  of the cosmic ray and the simulation itself.
  */
@@ -45,17 +46,21 @@ private:
 	double trajectoryLength; /**< Comoving distance [m] the candidate has traveled so far */
 	double currentStep; /**< Size of the currently performed step in [m] comoving units */
 	double nextStep; /**< Proposed size of the next propagation step in [m] comoving units */
+	double stepRadiation; /**<Electromagnetic radiation lost at current step */
 	std::string tagOrigin; /**< Name of interaction/source process which created this candidate*/
 
 	static uint64_t nextSerialNumber;
 	uint64_t serialNumber;
 
 public:
+	
 	Candidate(
 		int id = 0,
 		double energy = 0,
 		Vector3d position = Vector3d(0, 0, 0),
 		Vector3d direction = Vector3d(-1, 0, 0),
+		double pmass = 0,
+		double mcharge = 0,
 		double z = 0,
 		double weight = 1., 
 		std::string tagOrigin = "PRIM"
@@ -116,7 +121,9 @@ public:
 
 	/**
 	 Add a new candidate to the list of secondaries.
-	 @param c Candidate
+	 @param id		particle ID of the secondary
+	 @param energy	energy of the secondary
+
 	 Adds a new candidate to the list of secondaries of this candidate.
 	 The secondaries Candidate::source and Candidate::previous state are set to the _source_ and _previous_ state of its parent.
 	 The secondaries Candidate::created and Candidate::current state are set to the _current_ state of its parent, except for the secondaries current energy and particle id.
@@ -124,22 +131,7 @@ public:
 	 */
 	void addSecondary(Candidate *c);
 	inline void addSecondary(ref_ptr<Candidate> c) { addSecondary(c.get()); };
-	/**
-	 Add a new candidate to the list of secondaries.
-	 @param id			particle ID of the secondary
-	 @param energy		energy of the secondary
-	 @param w			weight of the secondary
-	 @param tagOrigin 	tag of the secondary
-	 */
 	void addSecondary(int id, double energy, double w = 1., std::string tagOrigin = "SEC");
-	/**
-	 Add a new candidate to the list of secondaries.
-	 @param id			particle ID of the secondary
-	 @param energy		energy of the secondary
-	 @param position	start position of the secondary
-	 @param w			weight of the secondary
-	 @param tagOrigin 	tag of the secondary
-	 */
 	void addSecondary(int id, double energy, Vector3d position, double w = 1., std::string tagOrigin = "SEC");
 	void clearSecondaries();
 
@@ -172,6 +164,14 @@ public:
 	 and activate it if inactive, e.g. restart it
 	*/
 	void restart();
+	
+	/**
+	 Sets the electromagnetic radiation loss variable at current step.
+	 Only the radiation module should use this.
+	 This is only for debugging, does not impact the code
+	 */
+	void setStepRadiation(double radiation);
+	double getStepRadiation() const;
 };
 
 /** @}*/
