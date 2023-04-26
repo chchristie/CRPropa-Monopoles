@@ -158,7 +158,7 @@ SourceParticleMonopole::SourceParticleMonopole(int id, double pmass, double mcha
 	setDescription();
 }
 
-void SourceParticleMonopole::prepareParticle(MParticleState& particle) const {
+void SourceParticleMonopole::prepareParticle(ParticleState& particle) const override {
 	particle.setId(id);
 	particle.setMass(pmass);
 	particle.setMcharge(mcharge);
