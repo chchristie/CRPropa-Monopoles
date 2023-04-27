@@ -148,20 +148,52 @@ double MCandidate::getStepRadiation() const {
 	return stepRadiation;
 }
 
-// ----------------------------------------------------------------------------
-/*
-SourceParticleMonopole
-*/
+// Source ---------------------------------------------------------------------
+void MSource::add(SourceFeature* property) {
+	features.push_back(property);
+}
 
+ref_ptr<Candidate> MSource::getCandidate() const {
+	ref_ptr<Candidate> candidate = static_cast<Candidate*>(new MCandidate());
+	for (int i = 0; i < features.size(); i++)
+		(*features[i]).prepareCandidate(*candidate);
+	return candidate;
+}
+
+std::string MSource::getDescription() const {
+	std::stringstream ss;
+	ss << "Cosmic ray source\n";
+	for (int i = 0; i < features.size(); i++)
+		ss << "    " << features[i]->getDescription();
+	return ss.str();
+}
+
+
+// SourceParticleMonopole ----------------------------------------------------------------------------
 SourceParticleMonopole::SourceParticleMonopole(int id, double pmass, double mcharge) :
 		id(id), pmass(pmass), mcharge(mcharge) {
 	setDescription();
 }
 
-void SourceParticleMonopole::prepareParticle(ParticleState& particle) const override {
-	particle.setId(id);
-	particle.setMass(pmass);
-	particle.setMcharge(mcharge);
+void SourceParticleMonopole::prepareCandidate(Candidate& candidate) const {
+	MCandidate& Mcandidate = *MCandidate::convertToMCandidate(&candidate);
+	ParticleState &source = Mcandidate.source;
+	MParticleState &Msource = Mcandidate.Msource;
+	
+	Msource.setPosition(source.getPosition());
+	Msource.setDirection(source.getDirection());
+	Msource.setEnergy(source.getEnergy());
+	
+	Msource.setId(id);
+	Msource.setMass(pmass);
+	Msource.setMcharge(mcharge);
+	
+	Mcandidate.created = Msource;
+	Mcandidate.current = Msource;
+	Mcandidate.previous = Msource;
+	Mcandidate.Mcreated = Msource;
+	Mcandidate.Mcurrent = Msource;
+	Mcandidate.Mprevious = Msource;
 }
 
 void SourceParticleMonopole::setDescription() {

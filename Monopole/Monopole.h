@@ -143,6 +143,22 @@ public:
 }; //MCandidate
 
 /**
+ @class MSource
+ @brief General source of particles compatible with monopoles
+
+ This class is a container for source features.
+ The source prepares a new candidate by passing it to all its source features
+ to be modified accordingly.
+ */
+class MSource: public SourceInterface {
+	std::vector<ref_ptr<SourceFeature> > features;
+public:
+	void add(SourceFeature* feature);
+	ref_ptr<Candidate> getCandidate() const;
+	std::string getDescription() const;
+}; //MSource
+
+/**
  @class SourceParticleMonopole
  @brief Magnetic Monopole at the source
 
@@ -160,7 +176,7 @@ public:
 	 @param id		id of the particle following the PDG numbering scheme
 	*/
 	SourceParticleMonopole(int id, double pmass = 100*gigaelectronvolt/c_squared, double mcharge = 1*gD);
-	void prepareParticle(MParticleState &particle) const;
+	void prepareCandidate(Candidate& candidate) const override;
 	void setDescription();
 }; // SourceParticleMonopole
 
